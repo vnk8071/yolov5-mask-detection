@@ -53,7 +53,7 @@ python detect.py --weights results/train/<version>/weights/best.pt --source ./da
 ```
 
 ## Result
-![result](https://github.com/vnk8071/yolov5-mask-detection/blob/master/images/results.jpg)
+![result](https://github.com/vnk8071/yolov5-mask-detection/blob/master/images/results.png)
 
 Some inferences:
 
