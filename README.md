@@ -39,7 +39,7 @@ The directory of dataset structured:
 python train.py --batch-size 64 --name <version> --device 0
 ```
 Note:
-- <version>: To save weights and results
+- [version]: To save weights and results
 - Remember to check the config before train in config/train_cfg.yaml
 
 ## Evaluate
