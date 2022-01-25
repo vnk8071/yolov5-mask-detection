@@ -1,10 +1,10 @@
 weights: 'pretrains/pretrain.pt' # path to pretrained model weight
-model_cfg: 'models/yolov5s.yaml' # path to model config
+model_cfg: '' # path to model config
 data_cfg: 'config/data_cfg.yaml' # path to data config
 hyp: 'config/hyps/my_hyperparameter.yaml' # path to hyper parameters config
 project: 'results/train'
 artifact_alias: 'latest'
-epochs: 5
+epochs: 100
 img_size: 640
 rect: False
 resume: False
