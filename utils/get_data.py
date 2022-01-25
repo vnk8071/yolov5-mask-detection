@@ -3,7 +3,7 @@ import shutil
 import requests
 from zipfile import ZipFile
 
-FILE_ID = '1-yPhAZ6tnTjh7PY2nNzkg2AVWfzgIRmN'
+FILE_ID = '1D1_lUIucMWqSDqZokohl8Aqd2G5K-LIz'
 TARGET_PATH = 'data/mask-fpt-ai.zip'
 
 
