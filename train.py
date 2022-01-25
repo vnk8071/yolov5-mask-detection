@@ -25,6 +25,7 @@ from utils.loggers import Loggers
 from utils.callbacks import Callbacks
 from utils.autoanchor import check_anchors
 from utils.datasets import create_dataloader
+from utils.downloads import attempt_download
 from utils.torch_utils import EarlyStopping, ModelEMA, de_parallel, intersect_dicts, select_device
 from utils.general import labels_to_class_weights, increment_path, labels_to_image_weights, init_seeds, \
     strip_optimizer, check_dataset, check_img_size, check_requirements, check_file,\
@@ -43,7 +44,7 @@ def train(hyp,
           device,
           callbacks
           ):
-    [save_dir, epochs, batch_size, pretrained_path,
+    [save_dir, epochs, batch_size, weights,
      evolve, data_cfg, model_cfg, resume, no_val, no_save, workers] = Path(args.save_dir), args.epochs, \
         args.batch_size, args.weights, \
         args.evolve, args.data_cfg, args.model_cfg, \
@@ -68,7 +69,7 @@ def train(hyp,
         yaml.safe_dump(vars(args), f, sort_keys=False)
 
     # Loggers
-    loggers = Loggers(save_dir, pretrained_path, args, hyp, LOGGER)
+    loggers = Loggers(save_dir, weights, args, hyp, LOGGER)
 
     # Register actions
     for k in methods(loggers):
@@ -93,12 +94,13 @@ def train(hyp,
         Model
     ===============================
     """
-    check_suffix(pretrained_path, '.pt')
-    use_pretrained = pretrained_path.endswith('.pt')
+    check_suffix(weights, '.pt')
+    use_pretrained = weights.endswith('.pt')
     check_point = None
     if use_pretrained:
+        weights = attempt_download(weights)
         check_point = torch.load(
-            pretrained_path, map_location=device)  # load checkpoint
+            weights, map_location=device)  # load checkpoint
 
         # create model
         model = Model(model_cfg or check_point['model'].yaml, ch=3, nc=num_class, anchors=hyp.get(
@@ -111,7 +113,7 @@ def train(hyp,
                               exclude=exclude)  # intersect
         model.load_state_dict(csd, strict=False)  # load
         LOGGER.info(
-            f'Transferred {len(csd)}/{len(model.state_dict())} items from {pretrained_path}')  # report
+            f'Transferred {len(csd)}/{len(model.state_dict())} items from {weights}')  # report
     else:
         # create model
         model = Model(model_cfg, ch=3, nc=num_class,
@@ -179,10 +181,10 @@ def train(hyp,
         # Epochs
         start_epoch = check_point['epoch'] + 1
         if resume:
-            assert start_epoch > 0, f'{pretrained_path} training to {epochs} epochs is finished, nothing to resume.'
+            assert start_epoch > 0, f'{weights} training to {epochs} epochs is finished, nothing to resume.'
         if epochs < start_epoch:
             LOGGER.info("{} has been trained for {} epochs. Fine-tuning for {} more epochs.".format(
-                pretrained_path,
+                weights,
                 check_point['epoch'],
                 epochs
             ))
