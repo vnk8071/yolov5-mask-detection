@@ -100,7 +100,7 @@ def run(weights='./pretrains/pretrain.pt',  # model.pt path(s)
     total_frames = 0
     count = 0
     start = time.perf_counter()
-    for path, im, im0s, vid_cap, vid_no, fr, num_frames in dataset:
+    for path, im, im0s, vid_cap, vid_no in dataset:
         file_name = path.rsplit('/', 1)[-1]
         if count == vid_no:
             count += 1
@@ -196,11 +196,6 @@ def run(weights='./pretrains/pretrain.pt',  # model.pt path(s)
                     vid_writer[i].write(im0)
     end = time.perf_counter()
     total = round(end - start)
-
-    # Save subtype classification of video
-    df = pd.DataFrame({'video_name': os.listdir(
-        source), 'subtype': subtype_list})
-    df.to_csv(path_or_buf=dir + '/subtype_video.csv', index=False)
 
     # Print results
     print('Total frames: ', total_frames)

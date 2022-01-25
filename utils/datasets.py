@@ -231,7 +231,7 @@ class LoadImages:  # for inference
         img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
         img = np.ascontiguousarray(img)
 
-        return path, img, img0, self.cap, self.count, self.frame, self.frames
+        return path, img, img0, self.cap, self.count
 
     def new_video(self, path):
         self.frame = 0
