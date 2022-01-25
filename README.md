@@ -49,7 +49,31 @@ python val.py --weights ./results/train/<version>/weights/best.pt  --task val --
 
 ## Inference
 ```bash
-python detect.py --weights results/train/<version>/weights/best.pt --source ./data/test --dir ./inference/<version>
+python detect.py --weights results/train/<version>/weights/best.pt --source ./data/images/test --dir ./inference/<version>
+```
+
+## Result
+![result](https://github.com/vnk8071/yolov5-mask-detection/blob/master/images/result.jpg)
+
+Some inference:
+
+![sample1](https://github.com/vnk8071/yolov5-mask-detection/blob/master/images/mask.jpg)
+
+![sample2](https://github.com/vnk8071/yolov5-mask-detection/blob/master/images/incorrect_mask.jpg)
+
+*<u>For more detail:</u>* https://drive.google.com/drive/folders/1bE2kh3Rp1IhNWma5EoYjvwJFjlWjLiim?usp=sharing
+
+## Inheritance trained:
+Change the path in config/train_cfg.yaml
+
+```bash
+weights: 'pretrains/pretrain.pt' ➡️ 'pretrains/yolov5s_best.pt'
+model_cfg: 'models/yolov5s.yaml' ➡️ ''
+```
+
+Or use different models (yolov5n, yolov5m, yolov5l, yolov5x) by
+```bash
+weights: 'pretrains/pretrain.pt' ➡️ 'pretrains/{model}.pt'
 ```
 
 ## **YOLOv5 🚀 by Ultralytics, GPL-3.0 license**
