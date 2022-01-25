@@ -1,10 +1,10 @@
 train: ./data/images/train  # relative path to train images
 val: ./data/images/val  # relative path to val images
-test: ./data/images/test_size # relative path to public test images
+test: ./data/images/test # relative path to public test images
 
 # Classes
-num_class: 8  # number of classes
+num_class: 3  # number of classes
 # names: ['0', '1', '2', '3', '4', '5', '6', '7']
-names: ['area_break', 'dimple_break', 'line_break', 'line_break_wRE', 'random_break', 'random_break_wRE', 'spot_break', 'spk']
+names: ['no mask', 'mask', 'incorrect mask']
 
 
