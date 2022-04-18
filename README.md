@@ -88,6 +88,10 @@ python app.py
 docker build -t mask_detection:1.0
 docker run -p 5000:5000 mask_detection:1.0
 ```
+or can pull image from docker hub
+```bash
+docker run -t -p 5000:5000 vnk8071/mask_detection:1.0
+```
 Check on website: `http://localhost:5000`
 
 ## **YOLOv5 🚀 by Ultralytics, GPL-3.0 license**
