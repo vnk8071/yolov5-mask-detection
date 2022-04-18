@@ -78,6 +78,18 @@ Or train from the scratch
 model_cfg: '' ➡️ 'models/yolov5s.yaml'
 ```
 
+## User Interface App by using Flask:
+```bash
+python app.py
+```
+
+## Package image by Docker
+```bash
+docker build -t mask_detection:1.0
+docker run -p 5000:5000 mask_detection:1.0
+```
+Check on website: `http://localhost:5000`
+
 ## **YOLOv5 🚀 by Ultralytics, GPL-3.0 license**
 
 Source: https://github.com/ultralytics/yolov5
