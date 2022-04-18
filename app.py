@@ -19,6 +19,9 @@ from models.experimental import attempt_load
 app = Flask(__name__)
 app.config.from_file("config/flask_cfg.json", load=json.load)
 
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
 # Params
 imgsz = [640, 640]
 dict_yolo_models = {'Yolov5s': 'models/best-yolov5s.pt'}
