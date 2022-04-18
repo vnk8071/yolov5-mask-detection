@@ -1,0 +1,56 @@
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  text-align: left;
+  margin: 0px;
+  padding: 0px;
+  background-color: #ffffff;
+}
+
+form {
+  text-align: left;
+  height: 95%;
+}
+
+.container {
+  padding: 10px;
+}
+
+.text_bottom {
+  bottom: 0;
+}
+
+img {
+  display: inline-block;
+  text-align: right;
+}
+
+.progress {
+  width: 100%;
+}
+
+.column {
+  float: left;
+  width: 50%;
+  padding-left: 2%;
+  padding-right: 2%;
+}
+
+.row::after {
+  clear: both;
+  display: table;
+}
+
+/* .row {
+  display: flex;
+}
+
+.column {
+  flex: 50%;
+  padding-left: 5%;
+  padding: 5px;
+} */

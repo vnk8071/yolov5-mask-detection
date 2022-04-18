@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: start;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 150%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/XuanTruongRadius.png" type="image/png">
+    <title>Phát hiện khẩu trang</title>
+</head>
+
+<body>
+    <form method=post enctype=multipart/form-data>
+        <div class="container">
+            <center>
+                <h3 style="color:#030d9b"><i>Hệ thống nhận diện đeo khẩu trang tự động bằng mô hình học sâu
+                        &emsp;</i><img src="static/XuanTruongRadius.png" width="10%"></h3>
+            </center>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="column">
+                <h4>Ảnh gốc:</h4>
+                <img src="{{image}}" style="width:100%">
+            </div>
+            <div class="column">
+                <h4>Kết quả dự đoán ảnh:</h4>
+                <img src="{{image_predicted}}" style="width:100%">
+            </div>
+        </div>
+        <div style="height:10px"></div>
+        <hr>
+        <div class="container" style="padding-left: 5%;">
+            <h4>Trong ảnh bao gồm:</h4>
+            {% if count_class[0] != 0 %}
+            <p> &emsp; - {{ count_class[0] }} người không đeo khẩu trang </p>
+            {% endif %}
+            {% if count_class[1] != 0 %}
+            <p> &emsp; - {{ count_class[1] }} người đeo khẩu trang đúng cách </p>
+            {% endif %}
+            {% if count_class[2] != 0 %}
+            <p> &emsp; - {{ count_class[2] }} người đeo khẩu trang sai cách </p>
+            {% endif %}
+        </div>
+        <hr>
+        <div class="container">
+            <center>
+                <h4 style="color:#030d9b">Trường THCS & THPT Xuân Trường
+                </h4>
+            </center>
+        </div>
+    </form>
+</body>
+
+</html>
