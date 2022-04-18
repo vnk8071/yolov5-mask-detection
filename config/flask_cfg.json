@@ -1,0 +1,9 @@
+{
+    "UPLOAD_FOLDER": "static/uploads/",
+    "DEBUG": false,
+    "FLASK_ENV": "development",
+    "JSONIFY_MIMETYPE": "application/json",
+    "PORT": 5000,
+    "SERVER_IP": "192.168.0.23",
+    "SECRET_KEY": null
+}
