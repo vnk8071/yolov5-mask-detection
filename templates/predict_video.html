@@ -18,22 +18,10 @@
                 font-size: 150%;
             }
         }
-
-        table,
-        th,
-        td {
-            border: 1.5px solid black;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            text-align: center;
-        }
     </style>
     <link rel="stylesheet" href="/static/style.css">
-    <link rel="icon" href="/static/XuanTruongRadius.png" type="image/png">
-    <title>Phát hiện khẩu trang</title>
+    <link rel="icon" href="/static/LogoCSE.jpg" type="image/jpg">
+    <title>ITDS - Mask Detection</title>
 
 </head>
 
@@ -42,18 +30,28 @@
         <div style="height:20px"></div>
         <div class="container">
             <center>
-                <h3 style="color:#232ec5"><i>Hệ thống nhận diện đeo khẩu trang tự động bằng mô hình học sâu</i></h3>
+                <h3 style="color:#030d9b"><img src="static/LogoCSE.jpg" width="15%"><i>&emsp; Mask Detection App
+                        &emsp;</i><img src="static/LogoIU.png" width="15%"></h3>
             </center>
             <hr>
             <h3>
-                Kết quả dự đoán video:
+                Result:
             </h3>
-            <a href="{{video}}"> Download video</a>
+            {% if video %}
+            <div style="margin: 10px auto; text-align: center;">
+                <video controls="controls">
+                    <source src="{{ url_for('display_video', video=video) }}" type="video/mp4">
+                    </source>
+                </video>
+            </div>
+            {% endif %}
             <div style="height:30px"></div>
-            <center>
-                <h4 style="color:#030d9b">Trường THCS & THPT Xuân Trường &emsp;<img src="static/XuanTruongRadius.png"
-                        width="15%"></h4>
-            </center>
+        </div>
+        <div class="container-fluid" style="font-family: Verdana, sans-serif;">
+            <center><small>
+                    <font size="3"><i class="fa fa-copyright"></i> 2022 Data Science - International University
+                    </font>
+                </small></center>
         </div>
     </form>
 </body>

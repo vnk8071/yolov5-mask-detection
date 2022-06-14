@@ -22,41 +22,32 @@
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" href="/static/LogoCSE.jpg" type="image/jpg">
     <title>ITDS - Mask Detection</title>
-
+    <script>
+        function toggle_display() {
+            var x = document.getElementById("video_can_show");
+            if (x.style.display == "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+    </script>
 </head>
 
 <body>
-    <form method=post enctype=multipart/form-data>
-        <div class="container">
-            <center>
-                <h3 style="color:#030d9b"><img src="static/LogoCSE.jpg" width="15%"><i>&emsp; Mask Detection App
-                        &emsp;</i><img src="static/LogoIU.png" width="15%"></h3>
-            </center>
-        </div>
-        <hr>
+    <div class="container">
+        <center>
+            <h3 style="color:#030d9b"><img src="static/LogoCSE.jpg" width="15%"><i>&emsp; Mask Detection App
+                    &emsp;</i><img src="static/LogoIU.png" width="15%"></h3>
+        </center>
         <div class="row">
-            <div class="column">
-                <h4>Original image:</h4>
-                <img src="{{image}}" style="width:100%">
+            <div class="col-lg-8  offset-lg-2 ">
+                <h3 class="mt-5">Camera Streaming</h3>
+                <button onclick="toggle_display()">Show camera</button>
+                <div id="video_can_show" style="display:none">
+                    <img src="{{ url_for('video_feed') }}" width="100%">
+                </div>
             </div>
-            <div class="column">
-                <h4>Result predicted:</h4>
-                <img src="{{image_predicted}}" style="width:100%">
-            </div>
-        </div>
-        <div style="height:10px"></div>
-        <hr>
-        <div class="container" style="padding-left: 5%;">
-            <h4>In the picture include:</h4>
-            {% if count_class[0] != 0 %}
-            <p> &emsp; - {{ count_class[0] }} people(s) not wearing masks </p>
-            {% endif %}
-            {% if count_class[1] != 0 %}
-            <p> &emsp; - {{ count_class[1] }} people(s) not wearing masks correct </p>
-            {% endif %}
-            {% if count_class[2] != 0 %}
-            <p> &emsp; - {{ count_class[2] }} people(s) not wearing masks incorrect </p>
-            {% endif %}
         </div>
         <div class="container-fluid" style="font-family: Verdana, sans-serif;">
             <center><small>
@@ -64,9 +55,8 @@
                     </font>
                 </small></center>
         </div>
-    </form>
-
-
+    </div>
 </body>
+
 
 </html>

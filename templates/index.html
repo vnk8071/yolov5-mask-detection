@@ -20,8 +20,8 @@
         }
     </style>
     <link rel="stylesheet" href="/static/style.css">
-    <link rel="icon" href="/static/XuanTruongRadius.png" type="image/png">
-    <title>Phát hiện khẩu trang</title>
+    <link rel="icon" href="/static/LogoCSE.jpg" type="image/jpg">
+    <title>ITDS - Mask Detection</title>
 
 </head>
 
@@ -29,21 +29,17 @@
     <form method=post enctype=multipart/form-data>
         <div class="container">
             <center>
-                <h3 style="color:#030d9b"><i>Hệ thống nhận diện đeo khẩu trang tự động bằng mô hình học sâu</i></h3>
+                <h3 style="color:#030d9b"><img src="static/LogoCSE.jpg" width="15%"><i>&emsp; Mask Detection App
+                        &emsp;</i><img src="static/LogoIU.png" width="15%"></h3>
             </center>
             <hr>
-            <h5>Upload ảnh/video đeo khẩu trang:</h5>
+            <h5>Upload image/video for mask detection:</h5>
             <input type="file" name="file" class="form-control-file" id="inputfile" name="inputfile">
             <div style="height:30px"></div>
-            <div style="height:30px"></div>
             <button class="btn btn-lg btn-primary btn-block" id="submit" type="submit" style="background-color:#78787b"
-                onclick="progress()">Nhận diện</button>
+                onclick="progress()">Predict</button>
             <div style="height:20px"></div>
             <hr>
-            <center>
-                <h4 style="color:#030d9b">Trường THCS & THPT Xuân Trường &emsp;<img src="static/XuanTruongRadius.png"
-                        width="15%"></h4>
-            </center>
             <!-- <progress id="progressBar" value="0" max="100" style="width:0%;"></progress> -->
             <div style="height:20px"></div>
             <div class="progress">
@@ -96,12 +92,12 @@
     </script>
 
     <footer>
-        <!-- <div class="container-fluid" style="font-family: Verdana, sans-serif;">
+        <div class="container-fluid" style="font-family: Verdana, sans-serif;">
             <center><small>
-                    <font size="3"><i class="fa fa-copyright"></i> 2022 A2DS | Rohto for support
+                    <font size="3"><i class="fa fa-copyright"></i> 2022 Data Science - International University
                     </font>
                 </small></center>
-        </div> -->
+        </div>
     </footer>
 </body>
 
