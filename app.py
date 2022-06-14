@@ -1,6 +1,6 @@
-from utils.general import scale_coords
+from utils.general import check_img_size, non_max_suppression, scale_coords
 from utils.plots import Annotator, colors
-from utils.flask_utils import extract_file, get_object_predict, process_predict
+from utils.flask_utils import extract_file, get_object_predict, process_predict, get_image
 
 import cv2
 import copy
@@ -12,8 +12,9 @@ import time
 import tempfile
 import torch
 
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, Response, redirect, url_for
 from models.experimental import attempt_load
+from utils.augmentations import letterbox
 
 # Init flask
 app = Flask(__name__)
@@ -24,7 +25,7 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 # Params
 imgsz = [640, 640]
-dict_yolo_models = {'Yolov5s': 'models/best-yolov5s.pt'}
+dict_yolo_models = {'Yolov5s': 'models/best.pt'}
 
 
 def read_video_cap(file):
@@ -35,10 +36,21 @@ def read_video_cap(file):
     return vid_cap, num_frames
 
 
+def convert_avi_to_mp4(avi_file_path, output_name):
+    os.popen("ffmpeg -i '{input}' -ac 2 -b:v 2000k -c:a aac -c:v libx264 -b:a 160k -vprofile high -bf 0 -strict experimental -f mp4 '{output}.mp4'".format(
+        input=avi_file_path, output=output_name))
+    return True
+
+
 @app.route('/')
 def upload_form():
     return render_template("index.html",
                            len_yolo=len(dict_yolo_models.keys()), list_yolo_models=list(dict_yolo_models.keys()))
+
+
+@app.route('/display/<video>.mp4')
+def display_video(video):
+    return redirect(url_for('static', filename='uploads/' + video + '.mp4'), code=301)
 
 
 @app.route('/', methods=['POST'])
@@ -91,15 +103,15 @@ def predict():
                             frame, imgsz, model_object)
                         img, _ = process_predict(img, object_predict,
                                                  frame, names)
-                        vid_writer.write(img)
-
                     elif ret and i % 3 != 0:
+                        img = get_image(frame, imgsz, model_object)
                         img, _ = process_predict(img, previous_pred_object,
                                                  frame, names)
-                        vid_writer.write(img)
                     else:
                         pass
+
                     previous_pred_object = copy.deepcopy(object_predict)
+                    vid_writer.write(img)
 
             else:
                 print("Cannot open ", filename)
@@ -107,6 +119,8 @@ def predict():
             # Save inference
             vid_cap.release()
             vid_writer.release()
+            convert_avi_to_mp4(save_file + '_predicted.avi',
+                               save_file + '_predicted')
             end = time.perf_counter()
 
             total = round(end - start)
@@ -114,7 +128,47 @@ def predict():
             print('Total frames: ', num_frames)
             print(
                 f"Total time: {total//60} minute(s) {total%60} seconds with {round(total/num_frames, 3)} second/frame")
-            return render_template("predict_video.html", video=save_file + '_predicted.avi')
+            return render_template("predict_video.html", video=filename + '_predicted')
+
+
+@app.route('/camera')
+def index():
+    # rendering webpage
+    return render_template('camera.html')
+
+
+def gen():
+    video = cv2.VideoCapture(0)
+    skip_frame = 30
+    num_frame = 0
+    imgsz = [640, 640]
+    # Load object detection model
+    model_object = attempt_load(
+        "models/best.pt", map_location='cpu')
+    names = model_object.names
+    while True:
+        success, image = video.read()
+        if num_frame % skip_frame == 0:
+            img, object_predict = get_object_predict(
+                image, imgsz, model_object)
+            img, _ = process_predict(img, object_predict,
+                                     image, names)
+
+        else:
+            img = get_image(image, imgsz, model_object)
+            img, _ = process_predict(img, previous_pred_object,
+                                     image, names)
+        num_frame += 1
+        previous_pred_object = copy.deepcopy(object_predict)
+        ret, jpeg = cv2.imencode('.jpg', img)
+        frame = jpeg.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+@app.route('/cameraresponse')
+def video_feed():
+    return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/predict', methods=['POST'])
