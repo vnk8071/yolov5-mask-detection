@@ -34,10 +34,13 @@ from utils.torch_utils import init_torch_seeds
 
 # Settings
 torch.set_printoptions(linewidth=320, precision=5, profile='long')
-np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
+# format short g, %precision=5
+np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})
 pd.options.display.max_columns = 10
-cv2.setNumThreads(0)  # prevent OpenCV from multithreading (incompatible with PyTorch DataLoader)
-os.environ['NUMEXPR_MAX_THREADS'] = str(min(os.cpu_count(), 8))  # NumExpr max threads
+# prevent OpenCV from multithreading (incompatible with PyTorch DataLoader)
+cv2.setNumThreads(0)
+os.environ['NUMEXPR_MAX_THREADS'] = str(
+    min(os.cpu_count(), 8))  # NumExpr max threads
 
 
 class Profile(contextlib.ContextDecorator):
@@ -60,7 +63,8 @@ class Timeout(contextlib.ContextDecorator):
         raise TimeoutError(self.timeout_message)
 
     def __enter__(self):
-        signal.signal(signal.SIGALRM, self._timeout_handler)  # Set handler for SIGALRM
+        # Set handler for SIGALRM
+        signal.signal(signal.SIGALRM, self._timeout_handler)
         signal.alarm(self.seconds)  # start countdown for SIGALRM to be raised
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -110,9 +114,11 @@ def user_config_dir(dir='Ultralytics', env_var='YOLOV5_CONFIG_DIR'):
     if env:
         path = Path(env)  # use environment variable
     else:
-        cfg = {'Windows': 'AppData/Roaming', 'Linux': '.config', 'Darwin': 'Library/Application Support'}  # 3 OS dirs
+        cfg = {'Windows': 'AppData/Roaming', 'Linux': '.config',
+               'Darwin': 'Library/Application Support'}  # 3 OS dirs
         path = Path.home() / cfg.get(platform.system(), '')  # OS-specific config dir
-        path = (path if is_writeable(path) else Path('/tmp')) / dir  # GCP and AWS lambda fix, only /tmp is writeable
+        path = (path if is_writeable(path) else Path('/tmp')) / \
+            dir  # GCP and AWS lambda fix, only /tmp is writeable
     path.mkdir(exist_ok=True)  # make if required
     return path
 
@@ -177,7 +183,8 @@ def check_online():
     # Check internet connectivity
     import socket
     try:
-        socket.create_connection(("1.1.1.1", 443), 5)  # check host accessibility
+        # check host accessibility
+        socket.create_connection(("1.1.1.1", 443), 5)
         return True
     except OSError:
         return False
@@ -193,9 +200,13 @@ def check_git_status():
     assert check_online(), 'skipping check (offline)' + msg
 
     cmd = 'git fetch && git config --get remote.origin.url'
-    url = check_output(cmd, shell=True, timeout=5).decode().strip().rstrip('.git')  # git fetch
-    branch = check_output('git rev-parse --abbrev-ref HEAD', shell=True).decode().strip()  # checked out
-    n = int(check_output(f'git rev-list {branch}..origin/master --count', shell=True))  # commits behind
+    url = check_output(cmd, shell=True, timeout=5).decode(
+    ).strip().rstrip('.git')  # git fetch
+    branch = check_output('git rev-parse --abbrev-ref HEAD',
+                          shell=True).decode().strip()  # checked out
+    # commits behind
+    n = int(check_output(
+        f'git rev-list {branch}..origin/master --count', shell=True))
     if n > 0:
         s = f"⚠️ YOLOv5 is out of date by {n} commit{'s' * (n > 1)}. Use `git pull` or `git clone {url}` to update."
     else:
@@ -222,8 +233,10 @@ def check_requirements(requirements='requirements.txt', exclude=(), install=True
     check_python()  # check python version
     if isinstance(requirements, (str, Path)):  # requirements.txt file
         file = Path(requirements)
-        assert file.exists(), f"{prefix} {file.resolve()} not found, check failed."
-        requirements = [f'{x.name}{x.specifier}' for x in pkg.parse_requirements(file.open()) if x.name not in exclude]
+        assert file.exists(
+        ), f"{prefix} {file.resolve()} not found, check failed."
+        requirements = [f'{x.name}{x.specifier}' for x in pkg.parse_requirements(
+            file.open()) if x.name not in exclude]
     else:  # list or tuple of packages
         requirements = [x for x in requirements if x not in exclude]
 
@@ -236,8 +249,10 @@ def check_requirements(requirements='requirements.txt', exclude=(), install=True
             if install:
                 print(f"{s}, attempting auto-update...")
                 try:
-                    assert check_online(), f"'pip install {r}' skipped (offline)"
-                    print(check_output(f"pip install '{r}'", shell=True).decode())
+                    assert check_online(
+                    ), f"'pip install {r}' skipped (offline)"
+                    print(check_output(
+                        f"pip install '{r}'", shell=True).decode())
                     n += 1
                 except Exception as e:
                     print(f'{prefix} {e}')
@@ -258,7 +273,8 @@ def check_img_size(imgsz, s=32, floor=0):
     else:  # list i.e. img_size=[640, 480]
         new_size = [max(make_divisible(x, int(s)), floor) for x in imgsz]
     if new_size != imgsz:
-        print(f'WARNING: --img-size {imgsz} must be multiple of max stride {s}, updating to {new_size}')
+        print(
+            f'WARNING: --img-size {imgsz} must be multiple of max stride {s}, updating to {new_size}')
     return new_size
 
 
@@ -273,7 +289,8 @@ def check_imshow():
         cv2.waitKey(1)
         return True
     except Exception as e:
-        print(f'WARNING: Environment does not support cv2.imshow() or PIL Image.show() image displays\n{e}')
+        print(
+            f'WARNING: Environment does not support cv2.imshow() or PIL Image.show() image displays\n{e}')
         return False
 
 
@@ -283,7 +300,8 @@ def check_suffix(file='yolov5s.pt', suffix=('.pt',), msg=''):
         if isinstance(suffix, str):
             suffix = [suffix]
         for f in file if isinstance(file, (list, tuple)) else [file]:
-            assert Path(f).suffix.lower() in suffix, f"{msg}{f} acceptable suffix is {suffix}"
+            assert Path(f).suffix.lower(
+            ) in suffix, f"{msg}{f} acceptable suffix is {suffix}"
 
 
 def check_yaml(file, suffix=('.yaml', '.yml')):
@@ -299,15 +317,19 @@ def check_file(file, suffix=''):
         return file
     elif file.startswith(('http:/', 'https:/')):  # download
         url = str(Path(file)).replace(':/', '://')  # Pathlib turns :// -> :/
-        file = Path(urllib.parse.unquote(file)).name.split('?')[0]  # '%2F' to '/', split https://url.com/file.txt?auth
+        # '%2F' to '/', split https://url.com/file.txt?auth
+        file = Path(urllib.parse.unquote(file)).name.split('?')[0]
         print(f'Downloading {url} to {file}...')
         torch.hub.download_url_to_file(url, file)
-        assert Path(file).exists() and Path(file).stat().st_size > 0, f'File download failed: {url}'  # check
+        assert Path(file).exists() and Path(file).stat(
+        ).st_size > 0, f'File download failed: {url}'  # check
         return file
     else:  # search
         files = glob.glob('./**/' + file, recursive=True)  # find file
         assert len(files), f'File not found: {file}'  # assert file was found
-        assert len(files) == 1, f"Multiple files match '{file}', specify exact path: {files}"  # assert unique
+        # assert unique
+        assert len(
+            files) == 1, f"Multiple files match '{file}', specify exact path: {files}"
         return files[0]  # return file
 
 
@@ -322,16 +344,20 @@ def check_dataset(data: Path) -> dict:
     path = Path(data.get('path') or '')
     for k in ['train', 'val', 'test']:
         if data.get(k):  # prepend path
-            data[k] = str(path / data[k]) if isinstance(data[k], str) else [str(path / x) for x in data[k]]
+            data[k] = str(path / data[k]) if isinstance(data[k],
+                                                        str) else [str(path / x) for x in data[k]]
 
     assert 'num_class' in data, "Dataset 'num_class' key missing."
     if 'names' not in data:
-        data['names'] = [f'class{i}' for i in range(data['nc'])]  # assign class names if missing
+        # assign class names if missing
+        data['names'] = [f'class{i}' for i in range(data['nc'])]
     train, val, test = [data.get(x) for x in ('train', 'val', 'test')]
     if val:
-        val = [Path(x).resolve() for x in (val if isinstance(val, list) else [val])]  # val path
+        val = [Path(x).resolve()
+               for x in (val if isinstance(val, list) else [val])]  # val path
         if not all(x.exists() for x in val):
-            print('\nWARNING: Dataset not found, nonexistent paths: %s' % [str(x) for x in val if not x.exists()])
+            print('\nWARNING: Dataset not found, nonexistent paths: %s' %
+                  [str(x) for x in val if not x.exists()])
 
     return data
 
@@ -346,9 +372,11 @@ def download(url, dir='.', unzip=True, delete=True, curl=False, threads=1):
         elif not f.exists():
             print(f'Downloading {url} to {f}...')
             if curl:
-                os.system(f"curl -L '{url}' -o '{f}' --retry 9 -C -")  # curl download, retry and resume on fail
+                # curl download, retry and resume on fail
+                os.system(f"curl -L '{url}' -o '{f}' --retry 9 -C -")
             else:
-                torch.hub.download_url_to_file(url, f, progress=True)  # torch download
+                torch.hub.download_url_to_file(
+                    url, f, progress=True)  # torch download
         if unzip and f.suffix in ('.zip', '.gz'):
             print(f'Unzipping {f}...')
             if f.suffix == '.zip':
@@ -363,7 +391,8 @@ def download(url, dir='.', unzip=True, delete=True, curl=False, threads=1):
     dir.mkdir(parents=True, exist_ok=True)  # make directory
     if threads > 1:
         pool = ThreadPool(threads)
-        pool.imap(lambda x: download_one(*x), zip(url, repeat(dir)))  # multi-threaded
+        pool.imap(lambda x: download_one(*x),
+                  zip(url, repeat(dir)))  # multi-threaded
         pool.close()
         pool.join()
     else:
@@ -388,7 +417,8 @@ def one_cycle(y1=0.0, y2=1.0, steps=100):
 
 def colorstr(*input):
     # Colors a string https://en.wikipedia.org/wiki/ANSI_escape_code, i.e.  colorstr('blue', 'hello world')
-    *args, string = input if len(input) > 1 else ('blue', 'bold', input[0])  # color arguments, string
+    # color arguments, string
+    *args, string = input if len(input) > 1 else ('blue', 'bold', input[0])
     colors = {'black': '\033[30m',  # basic colors
               'red': '\033[31m',
               'green': '\033[32m',
@@ -432,7 +462,8 @@ def labels_to_class_weights(labels, nc=80):
 
 def labels_to_image_weights(labels, nc=80, class_weights=np.ones(80)):
     # Produces image weights based on class_weights and image contents
-    class_counts = np.array([np.bincount(x[:, 0].astype(np.int), minlength=nc) for x in labels])
+    class_counts = np.array(
+        [np.bincount(x[:, 0].astype(np.int), minlength=nc) for x in labels])
     image_weights = (class_weights.reshape(1, nc) * class_counts).sum(1)
     # index = random.choices(range(n), weights=image_weights, k=1)  # weight image sample
     return image_weights
@@ -505,7 +536,8 @@ def segment2box(segment, width=640, height=640):
     x, y = segment.T  # segment xy
     inside = (x >= 0) & (y >= 0) & (x <= width) & (y <= height)
     x, y, = x[inside], y[inside]
-    return np.array([x.min(), y.min(), x.max(), y.max()]) if any(x) else np.zeros((1, 4))  # xyxy
+    # xyxy
+    return np.array([x.min(), y.min(), x.max(), y.max()]) if any(x) else np.zeros((1, 4))
 
 
 def segments2boxes(segments):
@@ -522,15 +554,18 @@ def resample_segments(segments, n=1000):
     for i, s in enumerate(segments):
         x = np.linspace(0, len(s) - 1, n)
         xp = np.arange(len(s))
-        segments[i] = np.concatenate([np.interp(x, xp, s[:, i]) for i in range(2)]).reshape(2, -1).T  # segment xy
+        segments[i] = np.concatenate(
+            [np.interp(x, xp, s[:, i]) for i in range(2)]).reshape(2, -1).T  # segment xy
     return segments
 
 
 def scale_coords(img1_shape, coords, img0_shape, ratio_pad=None):
     # Rescale coords (xyxy) from img1_shape to img0_shape
     if ratio_pad is None:  # calculate from img0_shape
-        gain = min(img1_shape[0] / img0_shape[0], img1_shape[1] / img0_shape[1])  # gain  = old / new
-        pad = (img1_shape[1] - img0_shape[1] * gain) / 2, (img1_shape[0] - img0_shape[0] * gain) / 2  # wh padding
+        gain = min(img1_shape[0] / img0_shape[0],
+                   img1_shape[1] / img0_shape[1])  # gain  = old / new
+        pad = (img1_shape[1] - img0_shape[1] * gain) / \
+            2, (img1_shape[0] - img0_shape[0] * gain) / 2  # wh padding
     else:
         gain = ratio_pad[0][0]
         pad = ratio_pad[1]
@@ -570,7 +605,8 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
     assert 0 <= iou_thres <= 1, f'Invalid IoU {iou_thres}, valid values are between 0.0 and 1.0'
 
     # Settings
-    min_wh, max_wh = 2, 4096  # (pixels) minimum and maximum box width and height
+    # (pixels) minimum and maximum box width and height
+    min_wh, max_wh = 2, 4096
     max_nms = 30000  # maximum number of boxes into torchvision.ops.nms()
     time_limit = 100  # seconds to quit after
     redundant = True  # require redundant detections
@@ -578,7 +614,8 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
     merge = False  # use merge-NMS
 
     t = time.time()
-    output = [torch.zeros((0, 6), device=prediction.device)] * prediction.shape[0]
+    output = [torch.zeros((0, 6), device=prediction.device)
+              ] * prediction.shape[0]
     for xi, x in enumerate(prediction):  # image index, image inference
         # Apply constraints
         # x[((x[..., 2:4] < min_wh) | (x[..., 2:4] > max_wh)).any(1), 4] = 0  # width-height
@@ -609,7 +646,8 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
             x = torch.cat((box[i], x[i, j + 5, None], j[:, None].float()), 1)
         else:  # best class only
             conf, j = x[:, 5:].max(1, keepdim=True)
-            x = torch.cat((box, conf, j.float()), 1)[conf.view(-1) > conf_thres]
+            x = torch.cat((box, conf, j.float()), 1)[
+                conf.view(-1) > conf_thres]
 
         # Filter by class
         if classes is not None:
@@ -624,11 +662,13 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
         if not n:  # no boxes
             continue
         elif n > max_nms:  # excess boxes
-            x = x[x[:, 4].argsort(descending=True)[:max_nms]]  # sort by confidence
+            # sort by confidence
+            x = x[x[:, 4].argsort(descending=True)[:max_nms]]
 
         # Batched NMS
         c = x[:, 5:6] * (0 if agnostic else max_wh)  # classes
-        boxes, scores = x[:, :4] + c, x[:, 4]  # boxes (offset by class), scores
+        # boxes (offset by class), scores
+        boxes, scores = x[:, :4] + c, x[:, 4]
         i = torchvision.ops.nms(boxes, scores, iou_thres)  # NMS
         if i.shape[0] > max_det:  # limit detections
             i = i[:max_det]
@@ -636,7 +676,8 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
             # update boxes as boxes(i,4) = weights(i,n) * boxes(n,4)
             iou = box_iou(boxes[i], boxes) > iou_thres  # iou matrix
             weights = iou * scores[None]  # box weights
-            x[i, :4] = torch.mm(weights, x[:, :4]).float() / weights.sum(1, keepdim=True)  # merged boxes
+            x[i, :4] = torch.mm(weights, x[:, :4]).float(
+            ) / weights.sum(1, keepdim=True)  # merged boxes
             if redundant:
                 i = i[iou.sum(1) > 1]  # require redundancy
 
@@ -648,7 +689,8 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
     return output
 
 
-def strip_optimizer(f='best.pt', s=''):  # from utils.general import *; strip_optimizer()
+# from utils.general import *; strip_optimizer()
+def strip_optimizer(f='best.pt', s=''):
     # Strip optimizer from 'f' to finalize training, optionally save as 's'
     x = torch.load(f, map_location=torch.device('cpu'))
     if x.get('ema'):
@@ -661,11 +703,13 @@ def strip_optimizer(f='best.pt', s=''):  # from utils.general import *; strip_op
         p.requires_grad = False
     torch.save(x, s or f)
     mb = os.path.getsize(s or f) / 1E6  # filesize
-    print(f"Optimizer stripped from {f},{(' saved as %s,' % s) if s else ''} {mb:.1f}MB")
+    print(
+        f"Optimizer stripped from {f},{(' saved as %s,' % s) if s else ''} {mb:.1f}MB")
 
 
 def print_mutation(results, hyp, save_dir, bucket):
-    evolve_csv, results_csv, evolve_yaml = save_dir / 'evolve.csv', save_dir / 'results.csv', save_dir / 'hyp_evolve.yaml'
+    evolve_csv, results_csv, evolve_yaml = save_dir / \
+        'evolve.csv', save_dir / 'results.csv', save_dir / 'hyp_evolve.yaml'
     keys = ('metrics/precision', 'metrics/recall', 'metrics/mAP_0.5', 'metrics/mAP_0.5:0.95',
             'val/box_loss', 'val/obj_loss', 'val/cls_loss') + tuple(hyp.keys())  # [results + hyps]
     keys = tuple(x.strip() for x in keys)
@@ -676,16 +720,19 @@ def print_mutation(results, hyp, save_dir, bucket):
     if bucket:
         url = f'gs://{bucket}/evolve.csv'
         if gsutil_getsize(url) > (os.path.getsize(evolve_csv) if os.path.exists(evolve_csv) else 0):
-            os.system(f'gsutil cp {url} {save_dir}')  # download evolve.csv if larger than local
+            # download evolve.csv if larger than local
+            os.system(f'gsutil cp {url} {save_dir}')
 
     # Log to evolve.csv
-    s = '' if evolve_csv.exists() else (('%20s,' * n % keys).rstrip(',') + '\n')  # add header
+    s = '' if evolve_csv.exists() else (
+        ('%20s,' * n % keys).rstrip(',') + '\n')  # add header
     with open(evolve_csv, 'a') as f:
         f.write(s + ('%20.5g,' * n % vals).rstrip(',') + '\n')
 
     # Print to screen
     print(colorstr('evolve: ') + ', '.join(f'{x.strip():>20s}' for x in keys))
-    print(colorstr('evolve: ') + ', '.join(f'{x:20.5g}' for x in vals), end='\n\n\n')
+    print(colorstr('evolve: ') +
+          ', '.join(f'{x:20.5g}' for x in vals), end='\n\n\n')
 
     # Save yaml
     with open(evolve_yaml, 'w') as f:
@@ -700,7 +747,8 @@ def print_mutation(results, hyp, save_dir, bucket):
         yaml.safe_dump(hyp, f, sort_keys=False)
 
     if bucket:
-        os.system(f'gsutil cp {evolve_csv} {evolve_yaml} gs://{bucket}')  # upload
+        # upload
+        os.system(f'gsutil cp {evolve_csv} {evolve_yaml} gs://{bucket}')
 
 
 def apply_classifier(x, model, img, im0):
@@ -727,13 +775,17 @@ def apply_classifier(x, model, img, im0):
                 im = cv2.resize(cutout, (224, 224))  # BGR
                 # cv2.imwrite('example%i.jpg' % j, cutout)
 
-                im = im[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
-                im = np.ascontiguousarray(im, dtype=np.float32)  # uint8 to float32
+                # BGR to RGB, to 3x416x416
+                im = im[:, :, ::-1].transpose(2, 0, 1)
+                im = np.ascontiguousarray(
+                    im, dtype=np.float32)  # uint8 to float32
                 im /= 255.0  # 0 - 255 to 0.0 - 1.0
                 ims.append(im)
 
-            pred_cls2 = model(torch.Tensor(ims).to(d.device)).argmax(1)  # classifier prediction
-            x[i] = x[i][pred_cls1 == pred_cls2]  # retain matching class detections
+            pred_cls2 = model(torch.Tensor(ims).to(d.device)
+                              ).argmax(1)  # classifier prediction
+            # retain matching class detections
+            x[i] = x[i][pred_cls1 == pred_cls2]
 
     return x
 
@@ -743,13 +795,15 @@ def save_one_box(xyxy, im, file='image.jpg', gain=1.02, pad=10, square=False, BG
     xyxy = torch.tensor(xyxy).view(-1, 4)
     b = xyxy2xywh(xyxy)  # boxes
     if square:
-        b[:, 2:] = b[:, 2:].max(1)[0].unsqueeze(1)  # attempt rectangle to square
+        b[:, 2:] = b[:, 2:].max(1)[0].unsqueeze(
+            1)  # attempt rectangle to square
     b[:, 2:] = b[:, 2:] * gain + pad  # box wh * gain + pad
     xyxy = xywh2xyxy(b).long()
     clip_coords(xyxy, im.shape)
     crop = im[int(xyxy[0, 1]):int(xyxy[0, 3]), int(xyxy[0, 0]):int(xyxy[0, 2]), ::(1 if BGR else -1)]
     if save:
-        cv2.imwrite(str(increment_path(file, mkdir=True).with_suffix('.jpg')), crop)
+        cv2.imwrite(
+            str(increment_path(file, mkdir=True).with_suffix('.jpg')), crop)
     return crop
 
 

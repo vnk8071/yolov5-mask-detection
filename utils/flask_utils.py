@@ -44,8 +44,38 @@ def get_object_predict(img0, imgsz, model_object):
 
     # NMS
     pred = non_max_suppression(
-        pred, 0.25, 0.45, max_det=1000)
+        pred, 0.6, 0.65, max_det=1000)
     return img, pred
+
+
+def get_image(img0, imgsz, model_object):
+    """
+    Return resized image (640, 640) and predict of object detection TBUP
+
+    Args:
+    img0<array> -- original image
+    imgsz<list> -- Height and Width to resize (Default [640, 640])
+    model_object<> -- load weight of object detection model
+    """
+    # Inference
+    model_object(torch.zeros(
+        1, 3, *imgsz).to('cpu').type_as(next(model_object.parameters())))
+    stride = int(model_object.stride.max())
+    imgsz = check_img_size(imgsz, s=stride)  # check image size
+
+    # Padded resize
+    img = letterbox(img0, imgsz[0],
+                    stride=stride, auto=True)[0]
+
+    # Convert
+    img = img.transpose((2, 0, 1))[::-1]  # HWC to CHW, BGR to RGB
+    img = np.ascontiguousarray(img)
+    img = torch.from_numpy(img)
+    img = img.float()/255
+
+    if len(img.shape) == 3:
+        img = img[None]  # expand for batch dim
+    return img
 
 
 def extract_file(request):
